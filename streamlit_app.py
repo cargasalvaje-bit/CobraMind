@@ -7,13 +7,19 @@ from moviepy.editor import ImageSequenceClip
 import tempfile
 import numpy as np
 
+# -------------------
 # API
+# -------------------
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
+# -------------------
 # CONFIG
+# -------------------
 st.set_page_config(page_title="CobraMind", page_icon="assets/logo.png", layout="wide")
 
+# -------------------
 # STATES
+# -------------------
 if "page" not in st.session_state:
     st.session_state.page = "chat"
 
@@ -58,38 +64,39 @@ with st.sidebar:
         st.session_state.page = "credits"
 
     st.markdown("---")
-
     st.markdown(f"💰 **CobraCredits:** {st.session_state.credits}")
-
     st.markdown("---")
 
 # -------------------
-# CHAT
+# CHAT PAGE
 # -------------------
 if st.session_state.page == "chat":
 
     st.title("CobraMind")
 
+    # Mostrar mensajes anteriores
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
+    # Input del usuario
     user_input = st.chat_input("Escribe algo...")
 
     if user_input:
 
-        cost = 250
+        cost = 250  # costo de cada mensaje
 
         if st.session_state.credits < cost:
             st.warning("No tienes suficientes CobraCredits ⚠️")
         else:
             st.session_state.credits -= cost
+            st.session_state.messages.append({"role": "user", "content": user_input})
 
-            st.session_state.messages.append({"role":"user","content":user_input})
-
+            # Mostrar mensaje del usuario
             with st.chat_message("user"):
                 st.markdown(user_input)
 
+            # Generar respuesta de CobraMind
             with st.chat_message("assistant"):
                 placeholder = st.empty()
                 full_response = ""
@@ -107,7 +114,7 @@ if st.session_state.page == "chat":
 
                 st.markdown(f"<sub>-{cost} ⚡</sub>", unsafe_allow_html=True)
 
-            st.session_state.messages.append({"role":"assistant","content":full_response})
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # -------------------
 # CREDITS PAGE
@@ -116,22 +123,26 @@ elif st.session_state.page == "credits":
 
     st.title("CobraCredits 🐍💰")
 
+    # Mostrar créditos actuales
+    st.markdown(f"💰 **Créditos actuales:** {st.session_state.credits}")
+
+    # Botones de compra
     col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("Starter\n50,000 ⚡\n$5"):
             st.session_state.credits += 50000
-            st.success("Compraste Starter")
+            st.success("Compraste Starter: +50,000 ⚡")
 
     with col2:
         if st.button("Pro\n150,000 ⚡\n$12"):
             st.session_state.credits += 150000
-            st.success("Compraste Pro")
+            st.success("Compraste Pro: +150,000 ⚡")
 
     with col3:
         if st.button("Elite\n400,000 ⚡\n$25"):
             st.session_state.credits += 400000
-            st.success("Compraste Elite")
+            st.success("Compraste Elite: +400,000 ⚡")
 
     st.markdown("---")
 
@@ -148,7 +159,7 @@ Tú decides cómo usarlos.
 """)
 
 # -------------------
-# ABOUT
+# ABOUT PAGE
 # -------------------
 elif st.session_state.page == "about":
 
