@@ -31,7 +31,7 @@ if "messages" not in st.session_state:
 if "conversations" not in st.session_state:
     st.session_state.conversations = []
 if "cobra_credits" not in st.session_state:
-    st.session_state.cobra_credits = 400000  # valor inicial grande
+    st.session_state.cobra_credits = 0  # inicia en 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -66,6 +66,7 @@ def generate_summary(messages):
 with st.sidebar:
     st.markdown("## 🐍 CobraMind")
 
+    # Botones de navegación
     if st.button("💬 Chat"):
         st.session_state.page = "chat"
     if st.button("📘 About CobraMind"):
@@ -75,6 +76,7 @@ with st.sidebar:
 
     st.markdown("---")
 
+    # Nuevo chat
     if st.button("➕ Nuevo Chat"):
         if st.session_state.messages:
             title = generate_summary(st.session_state.messages)
@@ -85,6 +87,7 @@ with st.sidebar:
             st.session_state.messages = []
             st.session_state.page = "chat"
 
+    # Conversaciones guardadas
     st.markdown("### Conversaciones")
     for i, conv in enumerate(st.session_state.conversations):
         if st.button(conv["title"], key=f"conv_{i}"):
@@ -92,6 +95,73 @@ with st.sidebar:
             st.session_state.page = "chat"
 
     st.markdown("---")
+    
+    # Créditos visibles
+    st.markdown("<h3 style='color:green'>💰 Créditos: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("Generar contenido")
+
+    # -------- IMAGEN --------
+    image_prompt = st.text_input(
+        "Prompt para imagen",
+        placeholder="Describe bien la imagen...",
+        key="image_prompt"
+    )
+    if st.button("Create Image"):
+        cost_image = 333
+        if st.session_state.cobra_credits < cost_image:
+            st.warning("No tienes suficientes CobraCredits para generar una imagen.")
+        elif image_prompt.strip():
+            with st.spinner("Generando imagen..."):
+                try:
+                    response = client.images.generate(
+                        model="gpt-image-1",
+                        prompt=image_prompt,
+                        size="1024x1024"
+                    )
+                    st.session_state.cobra_credits -= cost_image
+                    image_bytes = base64.b64decode(response.data[0].b64_json)
+                    image = Image.open(io.BytesIO(image_bytes))
+                    st.image(image, caption=image_prompt)
+                except Exception as e:
+                    st.error(f"Error generando imagen: {e}")
+        else:
+            st.warning("Escribe un prompt.")
+
+    # -------- VIDEO --------
+    video_prompt = st.text_input(
+        "Prompt para video",
+        placeholder="Describe bien el video...",
+        key="video_prompt"
+    )
+    if st.button("Create Video"):
+        cost_video = 1000
+        if st.session_state.cobra_credits < cost_video:
+            st.warning("No tienes suficientes CobraCredits para generar un video.")
+        elif video_prompt.strip():
+            with st.spinner("Generando video..."):
+                frames = []
+                try:
+                    base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
+                    for i in range(3):
+                        st.write(f"Frame {i+1}/3")
+                        response = client.images.generate(
+                            model="gpt-image-1",
+                            prompt=base_prompt + f", slight movement, frame {i+1}",
+                            size="1024x1024"
+                        )
+                        image_bytes = base64.b64decode(response.data[0].b64_json)
+                        image = Image.open(io.BytesIO(image_bytes))
+                        frames.append(image)
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
+                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
+                        clip.write_videofile(tmpfile.name, codec="libx264")
+                        st.session_state.cobra_credits -= cost_video
+                        st.success("Video listo 🎉")
+                        st.video(tmpfile.name)
+                except Exception as e:
+                    st.error(f"Error generando video: {e}")
 
 # -------------------
 # CHAT
@@ -101,7 +171,7 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
-    # Créditos visibles
+    # Créditos visibles en el chat
     st.markdown("<h3 style='color:green'>💰 Créditos actuales: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
 
     for msg in st.session_state.messages:
@@ -136,67 +206,6 @@ if st.session_state.page == "chat":
                     full_response = "Error con la API."
                     placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    # -------- GENERACIÓN DE IMÁGENES --------
-    image_prompt = st.text_input(
-        "Prompt para imagen",
-        placeholder="Describe bien la imagen...",
-        key="image_prompt"
-    )
-    if st.button("Create Image"):
-        cost_image = 50
-        if st.session_state.cobra_credits < cost_image:
-            st.warning("No tienes suficientes CobraCredits para generar una imagen.")
-        elif image_prompt.strip():
-            with st.spinner("Generando imagen..."):
-                try:
-                    response = client.images.generate(
-                        model="gpt-image-1",
-                        prompt=image_prompt,
-                        size="1024x1024"
-                    )
-                    st.session_state.cobra_credits -= cost_image
-                    image_bytes = base64.b64decode(response.data[0].b64_json)
-                    image = Image.open(io.BytesIO(image_bytes))
-                    st.image(image, caption=image_prompt)
-                except Exception as e:
-                    st.error(f"Error generando imagen: {e}")
-        else:
-            st.warning("Escribe un prompt.")
-
-    # -------- GENERACIÓN DE VIDEO --------
-    video_prompt = st.text_input(
-        "Prompt para video",
-        placeholder="Describe bien el video...",
-        key="video_prompt"
-    )
-    if st.button("Create Video"):
-        cost_video = 200
-        if st.session_state.cobra_credits < cost_video:
-            st.warning("No tienes suficientes CobraCredits para generar un video.")
-        elif video_prompt.strip():
-            with st.spinner("Generando video..."):
-                frames = []
-                try:
-                    base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
-                    for i in range(3):
-                        st.write(f"Frame {i+1}/3")
-                        response = client.images.generate(
-                            model="gpt-image-1",
-                            prompt=base_prompt + f", slight movement, frame {i+1}",
-                            size="1024x1024"
-                        )
-                        image_bytes = base64.b64decode(response.data[0].b64_json)
-                        image = Image.open(io.BytesIO(image_bytes))
-                        frames.append(image)
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
-                        clip.write_videofile(tmpfile.name, codec="libx264")
-                        st.session_state.cobra_credits -= cost_video
-                        st.success("Video listo 🎉")
-                        st.video(tmpfile.name)
-                except Exception as e:
-                    st.error(f"Error generando video: {e}")
 
 # -------------------
 # ABOUT
@@ -241,25 +250,25 @@ elif st.session_state.page == "credits":
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("Mini Pack - 50 CobraCredits - $2"):
-            st.session_state.cobra_credits += 50
+        if st.button("Mini Pack - 5 USD - 5,000 créditos"):
+            st.session_state.cobra_credits += 5000
             st.success("Seleccionaste Mini Pack")
     with col2:
-        if st.button("Pro Pack - 150 CobraCredits - $5"):
-            st.session_state.cobra_credits += 150
+        if st.button("Pro Pack - 20 USD - 20,000 créditos"):
+            st.session_state.cobra_credits += 20000
             st.success("Seleccionaste Pro Pack")
     with col3:
-        if st.button("Elite Pack - 400,000 CobraCredits - $30"):
-            st.session_state.cobra_credits += 400000
+        if st.button("Elite Pack - 100 USD - 100,000 créditos"):
+            st.session_state.cobra_credits += 100000
             st.success("Seleccionaste Elite Pack")
     
     st.markdown("---")
     st.markdown("""
 ### Cómo funcionan los CobraCredits
 
-- Cada mensaje de usuario consume créditos reales (50 créditos).  
-- Cada generación de imagen consume 50 créditos.  
-- Cada generación de video consume 200 créditos.  
+- Cada mensaje de usuario consume 50 créditos.  
+- Cada generación de imagen consume 333 créditos.  
+- Cada generación de video consume 1,000 créditos.  
 - Si no tienes créditos suficientes, no puedes enviar mensajes ni generar contenido.  
 - Puedes comprar packs y tus créditos se acumularán en tu cuenta.
 """)
