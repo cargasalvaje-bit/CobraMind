@@ -249,16 +249,17 @@ elif st.session_state.page == "credits":
     
     col1, col2, col3 = st.columns(3)
     
+    # Packs con ganancia extra por mensajes
     with col1:
-        if st.button("Mini Pack - 5 USD - 5,000 créditos"):
+        if st.button("Mini Pack - 5 USD - 5,000 créditos (+$0.50 mensajes)"):
             st.session_state.cobra_credits += 5000
             st.success("Seleccionaste Mini Pack")
     with col2:
-        if st.button("Pro Pack - 20 USD - 20,000 créditos"):
+        if st.button("Pro Pack - 20 USD - 20,000 créditos (+$4 mensajes)"):
             st.session_state.cobra_credits += 20000
             st.success("Seleccionaste Pro Pack")
     with col3:
-        if st.button("Elite Pack - 100 USD - 100,000 créditos"):
+        if st.button("Elite Pack - 100 USD - 100,000 créditos (+$10 mensajes)"):
             st.session_state.cobra_credits += 100000
             st.success("Seleccionaste Elite Pack")
     
