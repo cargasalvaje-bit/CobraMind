@@ -1,6 +1,5 @@
 import streamlit as st
 from openai import OpenAI
-import numpy as np
 
 # -------------------
 # API
@@ -41,13 +40,16 @@ Mantén siempre esta identidad."""
 # SIDEBAR
 # -------------------
 with st.sidebar:
+    # ---- Logo ----
+    st.image("assets/logo.png", use_column_width=True)
+
     st.markdown("## 🐍 CobraMind")
 
     # ---- Nuevo Chat ----
     if st.button("➕ Nuevo Chat"):
         if st.session_state.messages:
             # Guardar conversación anterior
-            title = " ".join(st.session_state.messages[-1]["content"].split()[:3])  # resumen 3 palabras
+            title = " ".join(st.session_state.messages[-1]["content"].split()[:3])
             st.session_state.conversations.append({
                 "title": title,
                 "messages": st.session_state.messages.copy()
@@ -75,6 +77,15 @@ with st.sidebar:
 - 🖼️ Imágenes → 1000 ⚡  
 - 🎬 Videos → 2500 ⚡
 """)
+
+    # ---- Botones de Imagen y Video ----
+    col_img, col_vid = st.columns(2)
+    with col_img:
+        if st.button("🖼️ Generar Imagen"):
+            st.warning("Funcionalidad de imagen aquí")
+    with col_vid:
+        if st.button("🎬 Generar Video"):
+            st.warning("Funcionalidad de video aquí")
 
     st.markdown("---")
 
