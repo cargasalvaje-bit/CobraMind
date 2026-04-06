@@ -1,10 +1,5 @@
 import streamlit as st
 from openai import OpenAI
-from PIL import Image
-import io
-import base64
-from moviepy.editor import ImageSequenceClip
-import tempfile
 import numpy as np
 
 # -------------------
@@ -22,15 +17,12 @@ st.set_page_config(page_title="CobraMind", page_icon="assets/logo.png", layout="
 # -------------------
 if "page" not in st.session_state:
     st.session_state.page = "chat"
-
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
 if "conversations" not in st.session_state:
-    st.session_state.conversations = []
-
+    st.session_state.conversations = []  # Guardará {'title':..., 'messages':...}
 if "credits" not in st.session_state:
-    st.session_state.credits = 0  # empieza en 0
+    st.session_state.credits = 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -38,13 +30,10 @@ if "credits" not in st.session_state:
 SYSTEM_PROMPT = {
     "role": "system",
     "content": """Eres CobraMind, una inteligencia artificial creada por Lorenzo Mazzini.
-
 Si alguien pregunta quién eres, responde EXACTAMENTE:
 Soy CobraMind, una inteligencia artificial creada por Lorenzo Mazzini.
-
 Si alguien pregunta quién te creó, responde:
 Lorenzo Mazzini, desarrollador peruano.
-
 Mantén siempre esta identidad."""
 }
 
@@ -54,23 +43,32 @@ Mantén siempre esta identidad."""
 with st.sidebar:
     st.markdown("## 🐍 CobraMind")
 
-    # ➕ Nuevo Chat
+    # ---- Nuevo Chat ----
     if st.button("➕ Nuevo Chat"):
+        if st.session_state.messages:
+            # Guardar conversación anterior
+            title = " ".join(st.session_state.messages[-1]["content"].split()[:3])  # resumen 3 palabras
+            st.session_state.conversations.append({
+                "title": title,
+                "messages": st.session_state.messages.copy()
+            })
         st.session_state.messages = []
         st.success("Conversación reiniciada.")
 
+    st.markdown("---")
+
+    # ---- Navegación ----
     if st.button("💬 Chat"):
         st.session_state.page = "chat"
-
     if st.button("📘 About CobraMind"):
         st.session_state.page = "about"
-
     if st.button("🏦 Credits"):
         st.session_state.page = "credits"
 
     st.markdown("---")
+
+    # ---- CobraCredits ----
     st.markdown(f"💰 **CobraCredits:** {st.session_state.credits}")
-    st.markdown("---")
     st.markdown("""
 ### 💰 Costos
 - 💬 Mensajes → 250 ⚡  
@@ -78,12 +76,23 @@ with st.sidebar:
 - 🎬 Videos → 2500 ⚡
 """)
 
+    st.markdown("---")
+
+    # ---- Conversaciones Guardadas ----
+    st.markdown("### 📂 Conversaciones guardadas")
+    if st.session_state.conversations:
+        for i, conv in enumerate(st.session_state.conversations[::-1]):
+            if st.button(conv["title"], key=f"conv_{i}"):
+                st.session_state.messages = conv["messages"].copy()
+                st.session_state.page = "chat"
+    else:
+        st.markdown("_No hay conversaciones guardadas_")
+
 # -------------------
 # CHAT PAGE
 # -------------------
 if st.session_state.page == "chat":
     st.title("CobraMind")
-
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
