@@ -61,12 +61,17 @@ def generate_summary(messages):
         return "Nueva conversación"
 
 # -------------------
+# FUNCIÓN REDONDEAR CREDITOS
+# -------------------
+def round_down_10(n):
+    return n - (n % 10)
+
+# -------------------
 # SIDEBAR
 # -------------------
 with st.sidebar:
     st.markdown("## 🐍 CobraMind")
 
-    # Botones de navegación
     if st.button("💬 Chat"):
         st.session_state.page = "chat"
     if st.button("📘 About CobraMind"):
@@ -76,7 +81,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Nuevo chat
     if st.button("➕ Nuevo Chat"):
         if st.session_state.messages:
             title = generate_summary(st.session_state.messages)
@@ -87,7 +91,6 @@ with st.sidebar:
             st.session_state.messages = []
             st.session_state.page = "chat"
 
-    # Conversaciones guardadas
     st.markdown("### Conversaciones")
     for i, conv in enumerate(st.session_state.conversations):
         if st.button(conv["title"], key=f"conv_{i}"):
@@ -95,8 +98,6 @@ with st.sidebar:
             st.session_state.page = "chat"
 
     st.markdown("---")
-    
-    # Créditos visibles
     st.markdown("<h3 style='color:green'>💰 Créditos: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
 
     st.markdown("---")
@@ -171,7 +172,6 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
-    # Créditos visibles en el chat
     st.markdown("<h3 style='color:green'>💰 Créditos actuales: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
 
     for msg in st.session_state.messages:
@@ -248,19 +248,23 @@ elif st.session_state.page == "credits":
     st.markdown("### Packs disponibles")
     
     col1, col2, col3 = st.columns(3)
-    
-    # Packs con ganancia extra por mensajes
+
+    # Créditos ya calculados para ganancia par
+    mini_credits = round_down_10(10000)      # Mini → $2 ganancia
+    pro_credits = round_down_10(40000)       # Pro → $8 ganancia
+    elite_credits = round_down_10(216660)    # Elite → $35 ganancia
+
     with col1:
-        if st.button("Mini Pack - 5 USD - 5,000 créditos (+$0.50 mensajes)"):
-            st.session_state.cobra_credits += 5000
+        if st.button(f"Mini Pack - 5 USD - {mini_credits:,} créditos"):
+            st.session_state.cobra_credits += mini_credits
             st.success("Seleccionaste Mini Pack")
     with col2:
-        if st.button("Pro Pack - 20 USD - 20,000 créditos (+$4 mensajes)"):
-            st.session_state.cobra_credits += 20000
+        if st.button(f"Pro Pack - 20 USD - {pro_credits:,} créditos"):
+            st.session_state.cobra_credits += pro_credits
             st.success("Seleccionaste Pro Pack")
     with col3:
-        if st.button("Elite Pack - 100 USD - 100,000 créditos (+$10 mensajes)"):
-            st.session_state.cobra_credits += 100000
+        if st.button(f"Elite Pack - 100 USD - {elite_credits:,} créditos"):
+            st.session_state.cobra_credits += elite_credits
             st.success("Seleccionaste Elite Pack")
     
     st.markdown("---")
