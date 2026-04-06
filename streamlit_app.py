@@ -30,6 +30,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "conversations" not in st.session_state:
     st.session_state.conversations = []
+if "cobra_credits" not in st.session_state:
+    st.session_state.cobra_credits = 400000  # Valor inicial grande
 
 # -------------------
 # SYSTEM PROMPT (IDENTIDAD)
@@ -92,61 +94,6 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Generar contenido")
 
-    # -------- IMAGEN --------
-    image_prompt = st.text_input(
-        "Prompt para imagen",
-        placeholder="Describe bien la imagen...",
-        key="image_prompt"
-    )
-    if st.button("Create Image"):
-        if image_prompt.strip():
-            with st.spinner("Generando imagen..."):
-                try:
-                    response = client.images.generate(
-                        model="gpt-image-1",
-                        prompt=image_prompt,
-                        size="1024x1024"
-                    )
-                    image_bytes = base64.b64decode(response.data[0].b64_json)
-                    image = Image.open(io.BytesIO(image_bytes))
-                    st.image(image, caption=image_prompt)
-                except Exception as e:
-                    st.error(f"Error generando imagen: {e}")
-        else:
-            st.warning("Escribe un prompt.")
-
-    # -------- VIDEO --------
-    video_prompt = st.text_input(
-        "Prompt para video",
-        placeholder="Describe bien el video...",
-        key="video_prompt"
-    )
-    if st.button("Create Video"):
-        if video_prompt.strip():
-            with st.spinner("Generando video..."):
-                frames = []
-                try:
-                    base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
-                    for i in range(3):
-                        st.write(f"Frame {i+1}/3")
-                        response = client.images.generate(
-                            model="gpt-image-1",
-                            prompt=base_prompt + f", slight movement, frame {i+1}",
-                            size="1024x1024"
-                        )
-                        image_bytes = base64.b64decode(response.data[0].b64_json)
-                        image = Image.open(io.BytesIO(image_bytes))
-                        frames.append(image)
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
-                        clip.write_videofile(tmpfile.name, codec="libx264")
-                        st.success("Video listo 🎉")
-                        st.video(tmpfile.name)
-                except Exception as e:
-                    st.error(f"Error generando video: {e}")
-        else:
-            st.warning("Escribe un prompt.")
-
 # -------------------
 # CHAT
 # -------------------
@@ -155,33 +102,41 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
+    # Mostrar créditos actuales
+    st.markdown("<h3 style='color:green'>💰 Créditos actuales: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
+
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
     user_input = st.chat_input("Escribe algo...")
     if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
-            st.markdown(user_input)
+        cost_message = 50  # Cada mensaje cuesta 50 créditos
+        if st.session_state.cobra_credits < cost_message:
+            st.warning("No tienes suficientes CobraCredits para enviar un mensaje.")
+        else:
+            st.session_state.cobra_credits -= cost_message
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            with st.chat_message("user"):
+                st.markdown(user_input)
 
-        with st.chat_message("assistant"):
-            placeholder = st.empty()
-            full_response = ""
-            try:
-                stream = client.chat.completions.create(
-                    model="gpt-4.1",
-                    messages=[SYSTEM_PROMPT] + st.session_state.messages,
-                    stream=True
-                )
-                for chunk in stream:
-                    if chunk.choices[0].delta.content:
-                        full_response += chunk.choices[0].delta.content
-                        placeholder.markdown(full_response)
-            except:
-                full_response = "Error con la API."
-                placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            with st.chat_message("assistant"):
+                placeholder = st.empty()
+                full_response = ""
+                try:
+                    stream = client.chat.completions.create(
+                        model="gpt-4.1",
+                        messages=[SYSTEM_PROMPT] + st.session_state.messages,
+                        stream=True
+                    )
+                    for chunk in stream:
+                        if chunk.choices[0].delta.content:
+                            full_response += chunk.choices[0].delta.content
+                            placeholder.markdown(full_response)
+                except:
+                    full_response = "Error con la API."
+                    placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # -------------------
 # ABOUT
@@ -215,18 +170,77 @@ Convertirse en una de las plataformas de IA más completas del mundo para ayudar
 """)
 
 # -------------------
+# GENERACIÓN DE IMÁGENES Y VIDEOS
+# -------------------
+if st.session_state.page in ["chat", "credits"]:
+    # Imagen
+    image_prompt = st.text_input(
+        "Prompt para imagen",
+        placeholder="Describe bien la imagen...",
+        key="image_prompt"
+    )
+    if st.button("Create Image"):
+        cost_image = 50
+        if st.session_state.cobra_credits < cost_image:
+            st.warning("No tienes suficientes CobraCredits para generar una imagen.")
+        elif image_prompt.strip():
+            with st.spinner("Generando imagen..."):
+                try:
+                    response = client.images.generate(
+                        model="gpt-image-1",
+                        prompt=image_prompt,
+                        size="1024x1024"
+                    )
+                    st.session_state.cobra_credits -= cost_image
+                    image_bytes = base64.b64decode(response.data[0].b64_json)
+                    image = Image.open(io.BytesIO(image_bytes))
+                    st.image(image, caption=image_prompt)
+                except Exception as e:
+                    st.error(f"Error generando imagen: {e}")
+        else:
+            st.warning("Escribe un prompt.")
+
+    # Video
+    video_prompt = st.text_input(
+        "Prompt para video",
+        placeholder="Describe bien el video...",
+        key="video_prompt"
+    )
+    if st.button("Create Video"):
+        cost_video = 200
+        if st.session_state.cobra_credits < cost_video:
+            st.warning("No tienes suficientes CobraCredits para generar un video.")
+        elif video_prompt.strip():
+            with st.spinner("Generando video..."):
+                frames = []
+                try:
+                    base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
+                    for i in range(3):
+                        st.write(f"Frame {i+1}/3")
+                        response = client.images.generate(
+                            model="gpt-image-1",
+                            prompt=base_prompt + f", slight movement, frame {i+1}",
+                            size="1024x1024"
+                        )
+                        image_bytes = base64.b64decode(response.data[0].b64_json)
+                        image = Image.open(io.BytesIO(image_bytes))
+                        frames.append(image)
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
+                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
+                        clip.write_videofile(tmpfile.name, codec="libx264")
+                        st.session_state.cobra_credits -= cost_video
+                        st.success("Video listo 🎉")
+                        st.video(tmpfile.name)
+                except Exception as e:
+                    st.error(f"Error generando video: {e}")
+
+# -------------------
 # COBRACREDITS
 # -------------------
 elif st.session_state.page == "credits":
     st.title("CobraCredits 🏦")
-    
-    # Inicializar créditos si no existen
-    if "cobra_credits" not in st.session_state:
-        st.session_state.cobra_credits = 400000  # Valor inicial grande como OpenAI
-    
-    # Créditos muy visibles
     st.markdown("<h2 style='color:green; text-align:center;'>💰 Créditos actuales: {:,} 🐍</h2>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
-    
+
     st.markdown("### Packs disponibles")
     
     col1, col2, col3 = st.columns(3)
@@ -248,9 +262,9 @@ elif st.session_state.page == "credits":
     st.markdown("""
 ### Cómo funcionan los CobraCredits
 
-- Cada mensaje de usuario consume un número de CobraCredits dependiendo de su longitud (solo ilustrativo, no se resta automáticamente).  
-- Cada generación de imagen consume 50 CobraCredits.  
-- Cada generación de video consume 200 CobraCredits.  
-- Puedes comprar packs y tus créditos se acumularán en tu cuenta.  
-- Los créditos se muestran arriba en verde y grande para que sean fáciles de ver.
+- Cada mensaje de usuario consume créditos reales (50 créditos).  
+- Cada generación de imagen consume 50 créditos.  
+- Cada generación de video consume 200 créditos.  
+- Si no tienes créditos suficientes, no puedes enviar mensajes ni generar contenido.  
+- Puedes comprar packs y tus créditos se acumularán en tu cuenta.
 """)
