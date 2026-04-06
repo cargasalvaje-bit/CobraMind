@@ -31,10 +31,10 @@ if "messages" not in st.session_state:
 if "conversations" not in st.session_state:
     st.session_state.conversations = []
 if "cobra_credits" not in st.session_state:
-    st.session_state.cobra_credits = 400000  # Valor inicial grande
+    st.session_state.cobra_credits = 400000  # valor inicial grande
 
 # -------------------
-# SYSTEM PROMPT (IDENTIDAD)
+# SYSTEM PROMPT
 # -------------------
 SYSTEM_PROMPT = {
     "role": "system",
@@ -92,7 +92,6 @@ with st.sidebar:
             st.session_state.page = "chat"
 
     st.markdown("---")
-    st.subheader("Generar contenido")
 
 # -------------------
 # CHAT
@@ -102,7 +101,7 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
-    # Mostrar créditos actuales
+    # Créditos visibles
     st.markdown("<h3 style='color:green'>💰 Créditos actuales: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
 
     for msg in st.session_state.messages:
@@ -111,7 +110,7 @@ if st.session_state.page == "chat":
 
     user_input = st.chat_input("Escribe algo...")
     if user_input:
-        cost_message = 50  # Cada mensaje cuesta 50 créditos
+        cost_message = 50
         if st.session_state.cobra_credits < cost_message:
             st.warning("No tienes suficientes CobraCredits para enviar un mensaje.")
         else:
@@ -138,42 +137,7 @@ if st.session_state.page == "chat":
                     placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-# -------------------
-# ABOUT
-# -------------------
-elif st.session_state.page == "about":
-    st.title("About CobraMind")
-    st.markdown("""
-CobraMind es una plataforma de inteligencia artificial de nueva generación diseñada para transformar la manera en que las personas piensan, crean y trabajan. 
-No es solo un chatbot, sino un sistema avanzado capaz de comprender el contexto, adaptarse al usuario y ofrecer soluciones reales en tiempo real. 
-Impulsada por modelos modernos como GPT-4.1, CobraMind combina velocidad, precisión y una experiencia intuitiva para ofrecer resultados de alta calidad. 
-Además CobraMind ofrece un código para ajustarse a su entorno y tipo de respuesta.
-
----
-
-### Capacidades avanzadas
-CobraMind genera contenido, resuelve problemas, explica conceptos y crea código. También incluye generación de imágenes, video, automatización y herramientas multimedia.
-
----
-
-### Por qué CobraMind
-Enfocada en rendimiento, simplicidad y evolución constante.
-
----
-
-### Visión
-Convertirse en una de las plataformas de IA más completas del mundo para ayudar a diversas personas.
-
----
-
-### Creado por Lorenzo Mazzini.
-""")
-
-# -------------------
-# GENERACIÓN DE IMÁGENES Y VIDEOS
-# -------------------
-if st.session_state.page in ["chat", "credits"]:
-    # Imagen
+    # -------- GENERACIÓN DE IMÁGENES --------
     image_prompt = st.text_input(
         "Prompt para imagen",
         placeholder="Describe bien la imagen...",
@@ -200,7 +164,7 @@ if st.session_state.page in ["chat", "credits"]:
         else:
             st.warning("Escribe un prompt.")
 
-    # Video
+    # -------- GENERACIÓN DE VIDEO --------
     video_prompt = st.text_input(
         "Prompt para video",
         placeholder="Describe bien el video...",
@@ -233,6 +197,37 @@ if st.session_state.page in ["chat", "credits"]:
                         st.video(tmpfile.name)
                 except Exception as e:
                     st.error(f"Error generando video: {e}")
+
+# -------------------
+# ABOUT
+# -------------------
+elif st.session_state.page == "about":
+    st.title("About CobraMind")
+    st.markdown("""
+CobraMind es una plataforma de inteligencia artificial de nueva generación diseñada para transformar la manera en que las personas piensan, crean y trabajan. 
+No es solo un chatbot, sino un sistema avanzado capaz de comprender el contexto, adaptarse al usuario y ofrecer soluciones reales en tiempo real. 
+Impulsada por modelos modernos como GPT-4.1, CobraMind combina velocidad, precisión y una experiencia intuitiva para ofrecer resultados de alta calidad. 
+Además CobraMind ofrece un código para ajustarse a su entorno y tipo de respuesta.
+
+---
+
+### Capacidades avanzadas
+CobraMind genera contenido, resuelve problemas, explica conceptos y crea código. También incluye generación de imágenes, video, automatización y herramientas multimedia.
+
+---
+
+### Por qué CobraMind
+Enfocada en rendimiento, simplicidad y evolución constante.
+
+---
+
+### Visión
+Convertirse en una de las plataformas de IA más completas del mundo para ayudar a diversas personas.
+
+---
+
+### Creado por Lorenzo Mazzini.
+""")
 
 # -------------------
 # COBRACREDITS
