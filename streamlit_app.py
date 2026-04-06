@@ -30,7 +30,7 @@ if "conversations" not in st.session_state:
     st.session_state.conversations = []
 
 if "credits" not in st.session_state:
-    st.session_state.credits = 0  # empieza con 0
+    st.session_state.credits = 0  # empieza en 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -54,6 +54,11 @@ Mantén siempre esta identidad."""
 with st.sidebar:
     st.markdown("## 🐍 CobraMind")
 
+    # ➕ Nuevo Chat
+    if st.button("➕ Nuevo Chat"):
+        st.session_state.messages = []
+        st.success("Conversación reiniciada.")
+
     if st.button("💬 Chat"):
         st.session_state.page = "chat"
 
@@ -66,11 +71,8 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(f"💰 **CobraCredits:** {st.session_state.credits}")
     st.markdown("---")
-
-    # Costos de cada servicio
     st.markdown("""
-### 💰 Costos de CobraCredits
-
+### 💰 Costos
 - 💬 Mensajes → 250 ⚡  
 - 🖼️ Imágenes → 1000 ⚡  
 - 🎬 Videos → 2500 ⚡
@@ -80,30 +82,20 @@ with st.sidebar:
 # CHAT PAGE
 # -------------------
 if st.session_state.page == "chat":
-
     st.title("CobraMind")
 
-    # Botón Nuevo Chat
-    if st.button("🆕 Nuevo Chat"):
-        st.session_state.messages = []
-        st.success("Conversación reiniciada.")
-
-    # Mostrar mensajes anteriores
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Input del usuario
     user_input = st.chat_input("Escribe algo...")
-
     if user_input:
         cost = 250
-
         if st.session_state.credits < cost:
             st.warning("No tienes suficientes CobraCredits ⚠️")
         else:
             st.session_state.credits -= cost
-            st.session_state.messages.append({"role": "user", "content": user_input})
+            st.session_state.messages.append({"role":"user","content":user_input})
 
             with st.chat_message("user"):
                 st.markdown(user_input)
@@ -111,75 +103,46 @@ if st.session_state.page == "chat":
             with st.chat_message("assistant"):
                 placeholder = st.empty()
                 full_response = ""
-
                 stream = client.chat.completions.create(
                     model="gpt-4.1",
                     messages=[SYSTEM_PROMPT] + st.session_state.messages,
                     stream=True
                 )
-
                 for chunk in stream:
                     if chunk.choices[0].delta.content:
                         full_response += chunk.choices[0].delta.content
                         placeholder.markdown(full_response)
 
                 st.markdown(f"<sub>-{cost} ⚡</sub>", unsafe_allow_html=True)
-
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            st.session_state.messages.append({"role":"assistant","content":full_response})
 
 # -------------------
 # CREDITS PAGE
 # -------------------
 elif st.session_state.page == "credits":
-
     st.title("CobraCredits 🐍💰")
-
-    st.markdown(f"💰 **Créditos actuales:** {st.session_state.credits}")
-
-    # Botones de compra
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Starter\n50,000 ⚡\n$5"):
             st.session_state.credits += 50000
-            st.success("Compraste Starter: +50,000 ⚡")
+            st.success("Compraste Starter")
     with col2:
         if st.button("Pro\n150,000 ⚡\n$12"):
             st.session_state.credits += 150000
-            st.success("Compraste Pro: +150,000 ⚡")
+            st.success("Compraste Pro")
     with col3:
         if st.button("Elite\n400,000 ⚡\n$25"):
             st.session_state.credits += 400000
-            st.success("Compraste Elite: +400,000 ⚡")
+            st.success("Compraste Elite")
 
     st.markdown("---")
-
-    # Botones de gastar créditos en Imágenes y Videos
-    col_img, col_vid = st.columns(2)
-    with col_img:
-        if st.button("Generar Imagen 🖼️ (-1000 ⚡)"):
-            if st.session_state.credits >= 1000:
-                st.session_state.credits -= 1000
-                st.success("Créditos descontados para generar Imagen")
-            else:
-                st.warning("No tienes suficientes CobraCredits ⚠️")
-    with col_vid:
-        if st.button("Generar Video 🎬 (-2500 ⚡)"):
-            if st.session_state.credits >= 2500:
-                st.session_state.credits -= 2500
-                st.success("Créditos descontados para generar Video")
-            else:
-                st.warning("No tienes suficientes CobraCredits ⚠️")
-
-    st.markdown("---")
-
     st.markdown("""
 ### 💰 ¿Qué son los CobraCredits?
-
 CobraMind funciona con créditos:
 
 - 💬 Mensajes → bajo costo  
-- 🖼️ Imágenes → medio costo  
-- 🎬 Videos → alto costo  
+- 🖼️ Imágenes → medio  
+- 🎬 Videos → alto  
 
 Tú decides cómo usarlos.
 """)
@@ -188,9 +151,7 @@ Tú decides cómo usarlos.
 # ABOUT PAGE
 # -------------------
 elif st.session_state.page == "about":
-
     st.title("About CobraMind")
-
     st.markdown("""
 CobraMind es una plataforma de inteligencia artificial avanzada.
 
