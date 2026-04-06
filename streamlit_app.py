@@ -220,18 +220,27 @@ Convertirse en una de las plataformas de IA más completas del mundo para ayudar
 elif st.session_state.page == "credits":
     st.title("CobraCredits 🏦")
     
+    # Mostrar créditos actuales
+    if "cobra_credits" not in st.session_state:
+        st.session_state.cobra_credits = 400000  # Valor inicial grande como OpenAI
+    
+    st.markdown(f"**💰 Créditos actuales:** {st.session_state.cobra_credits:,} 🐍")  # formatea con comas
+
     st.markdown("### Packs disponibles")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         if st.button("Mini Pack - 50 CobraCredits - $5"):
+            st.session_state.cobra_credits += 50
             st.success("Seleccionaste Mini Pack")
     with col2:
         if st.button("Pro Pack - 150 CobraCredits - $12"):
+            st.session_state.cobra_credits += 150
             st.success("Seleccionaste Pro Pack")
     with col3:
         if st.button("Elite Pack - 400 CobraCredits - $30"):
+            st.session_state.cobra_credits += 400
             st.success("Seleccionaste Elite Pack")
     
     st.markdown("---")
