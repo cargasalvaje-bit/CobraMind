@@ -30,7 +30,7 @@ if "conversations" not in st.session_state:
     st.session_state.conversations = []
 
 if "credits" not in st.session_state:
-    st.session_state.credits = 50000  # saldo inicial
+    st.session_state.credits = 0  # saldo inicial ahora es 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -74,17 +74,15 @@ if st.session_state.page == "chat":
 
     st.title("CobraMind")
 
-    # Mostrar mensajes anteriores
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Input del usuario
     user_input = st.chat_input("Escribe algo...")
 
     if user_input:
 
-        cost = 250  # costo de cada mensaje
+        cost = 250
 
         if st.session_state.credits < cost:
             st.warning("No tienes suficientes CobraCredits ⚠️")
@@ -92,11 +90,9 @@ if st.session_state.page == "chat":
             st.session_state.credits -= cost
             st.session_state.messages.append({"role": "user", "content": user_input})
 
-            # Mostrar mensaje del usuario
             with st.chat_message("user"):
                 st.markdown(user_input)
 
-            # Generar respuesta de CobraMind
             with st.chat_message("assistant"):
                 placeholder = st.empty()
                 full_response = ""
@@ -123,7 +119,6 @@ elif st.session_state.page == "credits":
 
     st.title("CobraCredits 🐍💰")
 
-    # Mostrar créditos actuales
     st.markdown(f"💰 **Créditos actuales:** {st.session_state.credits}")
 
     # Botones de compra
@@ -149,11 +144,11 @@ elif st.session_state.page == "credits":
     st.markdown("""
 ### 💰 ¿Qué son los CobraCredits?
 
-CobraMind funciona con créditos.
+CobraMind funciona con créditos:
 
-- 💬 Mensajes → bajo costo  
-- 🖼️ Imágenes → medio  
-- 🎬 Videos → alto  
+- 💬 **Mensajes** → bajo costo  
+- 🖼️ **Imágenes** → medio costo  
+- 🎬 **Videos** → alto costo  
 
 Tú decides cómo usarlos.
 """)
