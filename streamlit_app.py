@@ -30,7 +30,7 @@ if "conversations" not in st.session_state:
     st.session_state.conversations = []
 
 if "credits" not in st.session_state:
-    st.session_state.credits = 0  # saldo inicial ahora es 0
+    st.session_state.credits = 0  # empieza con 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -67,6 +67,15 @@ with st.sidebar:
     st.markdown(f"💰 **CobraCredits:** {st.session_state.credits}")
     st.markdown("---")
 
+    # Costos de cada servicio
+    st.markdown("""
+### 💰 Costos de CobraCredits
+
+- 💬 Mensajes → 250 ⚡  
+- 🖼️ Imágenes → 1000 ⚡  
+- 🎬 Videos → 2500 ⚡
+""")
+
 # -------------------
 # CHAT PAGE
 # -------------------
@@ -74,14 +83,20 @@ if st.session_state.page == "chat":
 
     st.title("CobraMind")
 
+    # Botón Nuevo Chat
+    if st.button("🆕 Nuevo Chat"):
+        st.session_state.messages = []
+        st.success("Conversación reiniciada.")
+
+    # Mostrar mensajes anteriores
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
+    # Input del usuario
     user_input = st.chat_input("Escribe algo...")
 
     if user_input:
-
         cost = 250
 
         if st.session_state.credits < cost:
@@ -123,21 +138,37 @@ elif st.session_state.page == "credits":
 
     # Botones de compra
     col1, col2, col3 = st.columns(3)
-
     with col1:
         if st.button("Starter\n50,000 ⚡\n$5"):
             st.session_state.credits += 50000
             st.success("Compraste Starter: +50,000 ⚡")
-
     with col2:
         if st.button("Pro\n150,000 ⚡\n$12"):
             st.session_state.credits += 150000
             st.success("Compraste Pro: +150,000 ⚡")
-
     with col3:
         if st.button("Elite\n400,000 ⚡\n$25"):
             st.session_state.credits += 400000
             st.success("Compraste Elite: +400,000 ⚡")
+
+    st.markdown("---")
+
+    # Botones de gastar créditos en Imágenes y Videos
+    col_img, col_vid = st.columns(2)
+    with col_img:
+        if st.button("Generar Imagen 🖼️ (-1000 ⚡)"):
+            if st.session_state.credits >= 1000:
+                st.session_state.credits -= 1000
+                st.success("Créditos descontados para generar Imagen")
+            else:
+                st.warning("No tienes suficientes CobraCredits ⚠️")
+    with col_vid:
+        if st.button("Generar Video 🎬 (-2500 ⚡)"):
+            if st.session_state.credits >= 2500:
+                st.session_state.credits -= 2500
+                st.success("Créditos descontados para generar Video")
+            else:
+                st.warning("No tienes suficientes CobraCredits ⚠️")
 
     st.markdown("---")
 
@@ -146,9 +177,9 @@ elif st.session_state.page == "credits":
 
 CobraMind funciona con créditos:
 
-- 💬 **Mensajes** → bajo costo  
-- 🖼️ **Imágenes** → medio costo  
-- 🎬 **Videos** → alto costo  
+- 💬 Mensajes → bajo costo  
+- 🖼️ Imágenes → medio costo  
+- 🎬 Videos → alto costo  
 
 Tú decides cómo usarlos.
 """)
