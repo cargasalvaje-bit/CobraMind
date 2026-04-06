@@ -220,36 +220,37 @@ Convertirse en una de las plataformas de IA más completas del mundo para ayudar
 elif st.session_state.page == "credits":
     st.title("CobraCredits 🏦")
     
-    # Mostrar créditos actuales
+    # Inicializar créditos si no existen
     if "cobra_credits" not in st.session_state:
         st.session_state.cobra_credits = 400000  # Valor inicial grande como OpenAI
     
-    st.markdown(f"**💰 Créditos actuales:** {st.session_state.cobra_credits:,} 🐍")  # formatea con comas
-
+    # Créditos muy visibles
+    st.markdown("<h2 style='color:green; text-align:center;'>💰 Créditos actuales: {:,} 🐍</h2>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
+    
     st.markdown("### Packs disponibles")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("Mini Pack - 50 CobraCredits - $5"):
+        if st.button("Mini Pack - 50 CobraCredits - $2"):
             st.session_state.cobra_credits += 50
             st.success("Seleccionaste Mini Pack")
     with col2:
-        if st.button("Pro Pack - 150 CobraCredits - $12"):
+        if st.button("Pro Pack - 150 CobraCredits - $5"):
             st.session_state.cobra_credits += 150
             st.success("Seleccionaste Pro Pack")
     with col3:
-        if st.button("Elite Pack - 400 CobraCredits - $30"):
-            st.session_state.cobra_credits += 400
+        if st.button("Elite Pack - 400,000 CobraCredits - $30"):
+            st.session_state.cobra_credits += 400000
             st.success("Seleccionaste Elite Pack")
     
     st.markdown("---")
     st.markdown("""
 ### Cómo funcionan los CobraCredits
 
-- Cada mensaje de usuario consume un número de CobraCredits dependiendo de su longitud.
-- Cada generación de imagen consume 50 CobraCredits.
-- Cada generación de video consume 200 CobraCredits.
-- Puedes comprar packs y tus créditos se acumularán en tu cuenta.
-- Los CobraCredits se muestran al final de cada respuesta como: `-50 🐍`.
+- Cada mensaje de usuario consume un número de CobraCredits dependiendo de su longitud (solo ilustrativo, no se resta automáticamente).  
+- Cada generación de imagen consume 50 CobraCredits.  
+- Cada generación de video consume 200 CobraCredits.  
+- Puedes comprar packs y tus créditos se acumularán en tu cuenta.  
+- Los créditos se muestran arriba en verde y grande para que sean fáciles de ver.
 """)
