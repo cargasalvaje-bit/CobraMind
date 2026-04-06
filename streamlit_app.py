@@ -90,64 +90,60 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Generar contenido")
 
-# -------------------
-# IMAGEN
-# -------------------
-image_prompt = st.text_input(
-    "Prompt para imagen",
-    placeholder="Describe bien la imagen...",
-    key="image_prompt"
-)
-if st.button("Create Image"):
-    if image_prompt.strip():
-        with st.spinner("Generando imagen..."):
-            try:
-                response = client.images.generate(
-                    model="gpt-image-1",
-                    prompt=image_prompt,
-                    size="1024x1024"
-                )
-                image_bytes = base64.b64decode(response.data[0].b64_json)
-                image = Image.open(io.BytesIO(image_bytes))
-                st.image(image, caption=image_prompt)
-            except Exception as e:
-                st.error(f"Error generando imagen: {e}")
-    else:
-        st.warning("Escribe un prompt.")
-
-# -------------------
-# VIDEO
-# -------------------
-video_prompt = st.text_input(
-    "Prompt para video",
-    placeholder="Describe bien el video...",
-    key="video_prompt"
-)
-if st.button("Create Video"):
-    if video_prompt.strip():
-        with st.spinner("Generando video..."):
-            frames = []
-            try:
-                base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
-                for i in range(3):
-                    st.write(f"Frame {i+1}/3")
+    # -------- IMAGEN --------
+    image_prompt = st.text_input(
+        "Prompt para imagen",
+        placeholder="Describe bien la imagen...",
+        key="image_prompt"
+    )
+    if st.button("Create Image"):
+        if image_prompt.strip():
+            with st.spinner("Generando imagen..."):
+                try:
                     response = client.images.generate(
                         model="gpt-image-1",
-                        prompt=base_prompt + f", slight movement, frame {i+1}",
+                        prompt=image_prompt,
                         size="1024x1024"
                     )
                     image_bytes = base64.b64decode(response.data[0].b64_json)
                     image = Image.open(io.BytesIO(image_bytes))
-                    frames.append(image)
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-                    clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
-                    clip.write_videofile(tmpfile.name, codec="libx264")
-                    st.success("Video listo 🎉")
-                    st.video(tmpfile.name)
-            except Exception as e:
-                st.error(f"Error generando video: {e}")
-    else:
-        st.warning("Escribe un prompt.")
+                    st.image(image, caption=image_prompt)
+                except Exception as e:
+                    st.error(f"Error generando imagen: {e}")
+        else:
+            st.warning("Escribe un prompt.")
+
+    # -------- VIDEO --------
+    video_prompt = st.text_input(
+        "Prompt para video",
+        placeholder="Describe bien el video...",
+        key="video_prompt"
+    )
+    if st.button("Create Video"):
+        if video_prompt.strip():
+            with st.spinner("Generando video..."):
+                frames = []
+                try:
+                    base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
+                    for i in range(3):
+                        st.write(f"Frame {i+1}/3")
+                        response = client.images.generate(
+                            model="gpt-image-1",
+                            prompt=base_prompt + f", slight movement, frame {i+1}",
+                            size="1024x1024"
+                        )
+                        image_bytes = base64.b64decode(response.data[0].b64_json)
+                        image = Image.open(io.BytesIO(image_bytes))
+                        frames.append(image)
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
+                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
+                        clip.write_videofile(tmpfile.name, codec="libx264")
+                        st.success("Video listo 🎉")
+                        st.video(tmpfile.name)
+                except Exception as e:
+                    st.error(f"Error generando video: {e}")
+        else:
+            st.warning("Escribe un prompt.")
 
 # -------------------
 # CHAT
