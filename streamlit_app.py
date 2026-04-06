@@ -4,7 +4,26 @@ from PIL import Image
 import io
 import base64
 from moviepy.editor import ImageSequenceClip
-i
+import tempfile
+import numpy as np
+
+# -------------------
+# API
+# -------------------
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+# -------------------
+# CONFIG
+# -------------------
+st.set_page_config(
+    page_title="CobraMind",
+    page_icon="assets/logo.png",
+    layout="wide"
+)
+
+# -------------------
+# STATES
+# -------------------
 if "page" not in st.session_state:
     st.session_state.page = "chat"
 if "messages" not in st.session_state:
@@ -15,6 +34,16 @@ if "cobra_credits" not in st.session_state:
     st.session_state.cobra_credits = 0  # inicia en 0
 
 # -------------------
+# SYSTEM PROMPT
+# -------------------
+SYSTEM_PROMPT = {
+    "role": "system",
+    "content": """
+Eres CobraMind, una inteligencia artificial creada por Lorenzo Mazzini. 
+Si alguien pregunta quién eres, responde EXACTAMENTE: Soy CobraMind, una inteligencia artificial creada por Lorenzo Mazzini. 
+Si alguien pregunta quién te creó, responde: Lorenzo Mazzini, desarrollador peruano. 
+Mantén siempre esta identidad.
+"""
 }
 
 # -------------------
@@ -226,4 +255,25 @@ elif st.session_state.page == "credits":
     elite_credits = round_down_10(216660)    # Elite → $35 ganancia
 
     with col1:
-        if st.
+        if st.button(f"Mini Pack - 5 USD - {mini_credits:,} créditos"):
+            st.session_state.cobra_credits += mini_credits
+            st.success("Seleccionaste Mini Pack")
+    with col2:
+        if st.button(f"Pro Pack - 20 USD - {pro_credits:,} créditos"):
+            st.session_state.cobra_credits += pro_credits
+            st.success("Seleccionaste Pro Pack")
+    with col3:
+        if st.button(f"Elite Pack - 100 USD - {elite_credits:,} créditos"):
+            st.session_state.cobra_credits += elite_credits
+            st.success("Seleccionaste Elite Pack")
+    
+    st.markdown("---")
+    st.markdown("""
+### Cómo funcionan los CobraCredits
+
+- Cada mensaje de usuario consume 50 créditos.  
+- Cada generación de imagen consume 333 créditos.  
+- Cada generación de video consume 1,000 créditos.  
+- Si no tienes créditos suficientes, no puedes enviar mensajes ni generar contenido.  
+- Puedes comprar packs y tus créditos se acumularán en tu cuenta.
+""")
