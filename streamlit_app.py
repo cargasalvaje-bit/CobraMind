@@ -68,6 +68,8 @@ with st.sidebar:
         st.session_state.page = "chat"
     if st.button("📘 About CobraMind"):
         st.session_state.page = "about"
+    if st.button("🏦 CobraCredits"):
+        st.session_state.page = "credits"
 
     st.markdown("---")
 
@@ -210,4 +212,35 @@ Convertirse en una de las plataformas de IA más completas del mundo para ayudar
 ---
 
 ### Creado por Lorenzo Mazzini.
+""")
+
+# -------------------
+# COBRACREDITS
+# -------------------
+elif st.session_state.page == "credits":
+    st.title("CobraCredits 🏦")
+    
+    st.markdown("### Packs disponibles")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("Mini Pack - 50 CobraCredits - $5"):
+            st.success("Seleccionaste Mini Pack")
+    with col2:
+        if st.button("Pro Pack - 150 CobraCredits - $12"):
+            st.success("Seleccionaste Pro Pack")
+    with col3:
+        if st.button("Elite Pack - 400 CobraCredits - $30"):
+            st.success("Seleccionaste Elite Pack")
+    
+    st.markdown("---")
+    st.markdown("""
+### Cómo funcionan los CobraCredits
+
+- Cada mensaje de usuario consume un número de CobraCredits dependiendo de su longitud.
+- Cada generación de imagen consume 50 CobraCredits.
+- Cada generación de video consume 200 CobraCredits.
+- Puedes comprar packs y tus créditos se acumularán en tu cuenta.
+- Los CobraCredits se muestran al final de cada respuesta como: `-50 🐍`.
 """)
