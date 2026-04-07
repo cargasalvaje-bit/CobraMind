@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # -------------------
-# FONDO ANIMADO (NUEVO)
+# FONDO ANIMADO (GRIS PARA FONDO BLANCO)
 # -------------------
 particles_js = """
 <style>
@@ -33,6 +33,7 @@ particles_js = """
     z-index: -1;
     top: 0;
     left: 0;
+    pointer-events: none;
 }
 </style>
 
@@ -56,43 +57,43 @@ tsParticles.load("particles-js", {
         },
         modes: {
             grab: {
-                distance: 180,
+                distance: 160,
                 links: {
-                    opacity: 0.7
+                    opacity: 0.6
                 }
             },
             push: {
-                quantity: 4
+                quantity: 3
             }
         }
     },
     particles: {
         color: {
-            value: "#ffffff"
+            value: "#888888"
         },
         links: {
-            color: "#ffffff",
-            distance: 150,
+            color: "#888888",
+            distance: 140,
             enable: true,
-            opacity: 0.2,
+            opacity: 0.4,
             width: 1
         },
         move: {
             enable: true,
-            speed: 0.6
+            speed: 0.5
         },
         number: {
             density: {
                 enable: true,
-                area: 800
+                area: 900
             },
-            value: 80
+            value: 70
         },
         opacity: {
-            value: 0.2
+            value: 0.5
         },
         size: {
-            value: { min: 1, max: 3 }
+            value: { min: 1, max: 2 }
         }
     },
     detectRetina: true
@@ -180,52 +181,6 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("<h3 style='color:green'>💰 Créditos: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.subheader("Generar contenido")
-
-    # -------- IMAGEN --------
-    image_prompt = st.text_input("Prompt para imagen", key="image_prompt")
-    if st.button("Create Image"):
-        cost_image = 333
-        if st.session_state.cobra_credits < cost_image:
-            st.warning("No tienes suficientes CobraCredits.")
-        elif image_prompt.strip():
-            response = client.images.generate(
-                model="gpt-image-1",
-                prompt=image_prompt,
-                size="1024x1024"
-            )
-            st.session_state.cobra_credits -= cost_image
-            image_bytes = base64.b64decode(response.data[0].b64_json)
-            st.image(Image.open(io.BytesIO(image_bytes)))
-
-    # -------- VIDEO --------
-    video_prompt = st.text_input("Prompt para video", key="video_prompt")
-    if st.button("Create Video"):
-        cost_video = 2000
-        if st.session_state.cobra_credits < cost_video:
-            st.warning("No tienes suficientes CobraCredits.")
-        elif video_prompt.strip():
-            frames = []
-            base_prompt = f"{video_prompt}, same character"
-            for i in range(6):
-                response = client.images.generate(
-                    model="gpt-image-1",
-                    prompt=base_prompt + f", frame {i}",
-                    size="1024x1024"
-                )
-                image_bytes = base64.b64decode(response.data[0].b64_json)
-                frames.append(Image.open(io.BytesIO(image_bytes)))
-
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-                clip = ImageSequenceClip(
-                    [np.array(f.convert("RGB")) for f in frames],
-                    fps=2
-                )
-                clip.write_videofile(tmpfile.name, codec="libx264")
-                st.session_state.cobra_credits -= cost_video
-                st.video(tmpfile.name)
 
 # -------------------
 # CHAT
