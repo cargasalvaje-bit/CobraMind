@@ -31,7 +31,7 @@ if "messages" not in st.session_state:
 if "conversations" not in st.session_state:
     st.session_state.conversations = []
 if "cobra_credits" not in st.session_state:
-    st.session_state.cobra_credits = 0  # inicia en 0
+    st.session_state.cobra_credits = 0
 
 # -------------------
 # SYSTEM PROMPT
@@ -172,7 +172,7 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
-    st.markdown("<h3 style='color:green'>💰 Créditos actuales: {:,} 🐍</h3>".format(st.session_state.cobra_credits), unsafe_allow_html=True)
+    # ❌ ELIMINADO: Créditos actuales en el centro
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
@@ -213,29 +213,7 @@ if st.session_state.page == "chat":
 elif st.session_state.page == "about":
     st.title("About CobraMind")
     st.markdown("""
-CobraMind es una plataforma de inteligencia artificial de nueva generación diseñada para transformar la manera en que las personas piensan, crean y trabajan. 
-No es solo un chatbot, sino un sistema avanzado capaz de comprender el contexto, adaptarse al usuario y ofrecer soluciones reales en tiempo real. 
-Impulsada por modelos modernos como GPT-4.1, CobraMind combina velocidad, precisión y una experiencia intuitiva para ofrecer resultados de alta calidad. 
-Además CobraMind ofrece un código para ajustarse a su entorno y tipo de respuesta.
-
----
-
-### Capacidades avanzadas
-CobraMind genera contenido, resuelve problemas, explica conceptos y crea código. También incluye generación de imágenes, video, automatización y herramientas multimedia.
-
----
-
-### Por qué CobraMind
-Enfocada en rendimiento, simplicidad y evolución constante.
-
----
-
-### Visión
-Convertirse en una de las plataformas de IA más completas del mundo para ayudar a diversas personas.
-
----
-
-### Creado por Lorenzo Mazzini.
+CobraMind es una plataforma de inteligencia artificial...
 """)
 
 # -------------------
@@ -249,10 +227,9 @@ elif st.session_state.page == "credits":
     
     col1, col2, col3 = st.columns(3)
 
-    # Créditos ya calculados para ganancia par
-    mini_credits = round_down_10(10000)      # Mini → $2 ganancia
-    pro_credits = round_down_10(40000)       # Pro → $8 ganancia
-    elite_credits = round_down_10(216660)    # Elite → $35 ganancia
+    mini_credits = round_down_10(10000)
+    pro_credits = round_down_10(40000)
+    elite_credits = round_down_10(216660)
 
     with col1:
         if st.button(f"Mini Pack - 5 USD - {mini_credits:,} créditos"):
@@ -266,14 +243,3 @@ elif st.session_state.page == "credits":
         if st.button(f"Elite Pack - 100 USD - {elite_credits:,} créditos"):
             st.session_state.cobra_credits += elite_credits
             st.success("Seleccionaste Elite Pack")
-    
-    st.markdown("---")
-    st.markdown("""
-### Cómo funcionan los CobraCredits
-
-- Cada mensaje de usuario consume 50 créditos.  
-- Cada generación de imagen consume 333 créditos.  
-- Cada generación de video consume 1,000 créditos.  
-- Si no tienes créditos suficientes, no puedes enviar mensajes ni generar contenido.  
-- Puedes comprar packs y tus créditos se acumularán en tu cuenta.
-""")
