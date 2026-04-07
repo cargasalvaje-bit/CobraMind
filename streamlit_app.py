@@ -137,7 +137,7 @@ with st.sidebar:
         key="video_prompt"
     )
     if st.button("Create Video"):
-        cost_video = 2000  # 👈 costo duplicado
+        cost_video = 2000
         if st.session_state.cobra_credits < cost_video:
             st.warning("No tienes suficientes CobraCredits para generar un video.")
         elif video_prompt.strip():
@@ -145,8 +145,7 @@ with st.sidebar:
                 frames = []
                 try:
                     base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
-
-                    total_frames = 6  # 👈 2 fps * 3 segundos
+                    total_frames = 6
 
                     for i in range(total_frames):
                         st.write(f"Frame {i+1}/{total_frames}")
@@ -162,7 +161,7 @@ with st.sidebar:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
                         clip = ImageSequenceClip(
                             [np.array(f.convert("RGB")) for f in frames],
-                            fps=2  # 👈 2 FPS
+                            fps=2
                         )
                         clip.write_videofile(tmpfile.name, codec="libx264")
 
@@ -212,6 +211,7 @@ if st.session_state.page == "chat":
                 except:
                     full_response = "Error con la API."
                     placeholder.markdown(full_response)
+
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # -------------------
@@ -256,9 +256,10 @@ elif st.session_state.page == "credits":
     
     col1, col2, col3 = st.columns(3)
 
-    mini_credits = round_down_10(10000)
-    pro_credits = round_down_10(40000)
-    elite_credits = round_down_10(216660)
+    # ✅ CAMBIO AQUÍ
+    mini_credits = round_down_10(8000)
+    pro_credits = round_down_10(32000)
+    elite_credits = round_down_10(200000)
 
     with col1:
         if st.button(f"Mini Pack - 5 USD - {mini_credits:,} créditos"):
