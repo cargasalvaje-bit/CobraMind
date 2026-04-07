@@ -172,7 +172,7 @@ if st.session_state.page == "chat":
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
 
-    # ❌ ELIMINADO: Créditos actuales en el centro
+    # ❌ eliminado créditos del centro
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
@@ -213,7 +213,29 @@ if st.session_state.page == "chat":
 elif st.session_state.page == "about":
     st.title("About CobraMind")
     st.markdown("""
-CobraMind es una plataforma de inteligencia artificial...
+CobraMind es una plataforma de inteligencia artificial de nueva generación diseñada para transformar la manera en que las personas piensan, crean y trabajan. 
+No es solo un chatbot, sino un sistema avanzado capaz de comprender el contexto, adaptarse al usuario y ofrecer soluciones reales en tiempo real. 
+Impulsada por modelos modernos como GPT-4.1, CobraMind combina velocidad, precisión y una experiencia intuitiva para ofrecer resultados de alta calidad. 
+Además CobraMind ofrece un código para ajustarse a su entorno y tipo de respuesta.
+
+---
+
+### Capacidades avanzadas
+CobraMind genera contenido, resuelve problemas, explica conceptos y crea código. También incluye generación de imágenes, video, automatización y herramientas multimedia.
+
+---
+
+### Por qué CobraMind
+Enfocada en rendimiento, simplicidad y evolución constante.
+
+---
+
+### Visión
+Convertirse en una de las plataformas de IA más completas del mundo para ayudar a diversas personas.
+
+---
+
+### Creado por Lorenzo Mazzini.
 """)
 
 # -------------------
