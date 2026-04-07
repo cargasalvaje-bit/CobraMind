@@ -53,7 +53,7 @@ def generate_summary(messages):
     try:
         user_text = "\n".join([m["content"] for m in messages if m["role"] == "user"])
         response = client.chat.completions.create(
-            model="gpt-4.1-mini",  # 👈 cambiado
+            model="gpt-4.1-mini",
             messages=[SYSTEM_PROMPT, {"role": "user", "content": f"Resume en 5 palabras: {user_text}"}]
         )
         return response.choices[0].message.content.strip()
@@ -200,7 +200,7 @@ if st.session_state.page == "chat":
                 full_response = ""
                 try:
                     stream = client.chat.completions.create(
-                        model="gpt-4.1-mini",  # 👈 cambiado
+                        model="gpt-4.1-mini",
                         messages=[SYSTEM_PROMPT] + st.session_state.messages,
                         stream=True
                     )
@@ -258,7 +258,7 @@ elif st.session_state.page == "credits":
 
     mini_credits = round_down_10(8000)
     pro_credits = round_down_10(32000)
-    elite_credits = round_down_10(200000)
+    elite_credits = round_down_10(185000)  # 👈 CAMBIO AQUÍ
 
     with col1:
         if st.button(f"Mini Pack - 5 USD - {mini_credits:,} créditos"):
