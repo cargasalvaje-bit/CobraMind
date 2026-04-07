@@ -137,7 +137,7 @@ with st.sidebar:
         key="video_prompt"
     )
     if st.button("Create Video"):
-        cost_video = 1000
+        cost_video = 2000  # 👈 costo duplicado
         if st.session_state.cobra_credits < cost_video:
             st.warning("No tienes suficientes CobraCredits para generar un video.")
         elif video_prompt.strip():
@@ -145,8 +145,11 @@ with st.sidebar:
                 frames = []
                 try:
                     base_prompt = f"{video_prompt}, same character, same style, smooth animation, cinematic"
-                    for i in range(3):
-                        st.write(f"Frame {i+1}/3")
+
+                    total_frames = 6  # 👈 2 fps * 3 segundos
+
+                    for i in range(total_frames):
+                        st.write(f"Frame {i+1}/{total_frames}")
                         response = client.images.generate(
                             model="gpt-image-1",
                             prompt=base_prompt + f", slight movement, frame {i+1}",
@@ -155,12 +158,18 @@ with st.sidebar:
                         image_bytes = base64.b64decode(response.data[0].b64_json)
                         image = Image.open(io.BytesIO(image_bytes))
                         frames.append(image)
+
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-                        clip = ImageSequenceClip([np.array(f.convert("RGB")) for f in frames], fps=2)
+                        clip = ImageSequenceClip(
+                            [np.array(f.convert("RGB")) for f in frames],
+                            fps=2  # 👈 2 FPS
+                        )
                         clip.write_videofile(tmpfile.name, codec="libx264")
+
                         st.session_state.cobra_credits -= cost_video
                         st.success("Video listo 🎉")
                         st.video(tmpfile.name)
+
                 except Exception as e:
                     st.error(f"Error generando video: {e}")
 
@@ -171,8 +180,6 @@ if st.session_state.page == "chat":
     st.image("assets/logo.png", width=120)
     st.title("CobraMind")
     st.caption("AI Assistant • Powered by OpenAI")
-
-    # ❌ eliminado créditos del centro
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
