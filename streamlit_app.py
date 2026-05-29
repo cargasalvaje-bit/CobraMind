@@ -336,6 +336,9 @@ elif st.session_state.page == "about":
     st.markdown("### The Inspiration")
     st.write("The platform was inspired by a core vision to build a continuous, hyper-responsive digital companion that transcends the limits of standard text chatbots. It is driven by the ambition to build toolsets that empower individual builders, unlocking new horizons of scalable creative expression and professional productivity.")
 
+    st.markdown("### Created By...")
+    st.write("CobraMind its made by Lorenzo Mazzini a peruvian developer with a vision towards the future.")
+
 elif st.session_state.page == "credits":
     st.title("🏦 CobraCredits Bank")
     st.write(f"Actualmente posees **{st.session_state.cobra_credits:,}** créditos CobraCredits.")
