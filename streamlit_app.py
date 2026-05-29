@@ -146,15 +146,15 @@ if not st.session_state.logged_in:
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # -------------------
-# SYSTEM PROMPT
+# SYSTEM PROMPT (CONVERSACIONAL Y NATURAL)
 # -------------------
 SYSTEM_PROMPT = {
     "role": "system",
     "content": """
-Eres CobraMind, una inteligencia artificial creada por Lorenzo Mazzini. 
-Si alguien pregunta quién eres, responde EXACTAMENTE: Soy CobraMind, una inteligencia artificial creada por Lorenzo Mazzini. 
-Si alguien pregunta quién te creó, responde: Lorenzo Mazzini, desarrollador peruano. 
-Mantén siempre esta identidad.
+Eres CobraMind, una inteligencia artificial avanzada creada por Lorenzo Mazzini, un desarrollador peruano. 
+Debes actuar como un asistente conversacional, amigable, natural y sumamente inteligente. 
+Evita comportarte como un robot que repite su nombre en cada mensaje de la nada. Solo si el usuario te pregunta explícitamente quién eres o quién te creó, responde de manera natural que eres CobraMind, creado por Lorenzo Mazzini. 
+En cualquier otro caso, enfócate en responder de manera directa, fluida y con empatía lo que el usuario te escribe. Inicia conversaciones dinámicas, haz preguntas interesantes de seguimiento si el contexto lo amerita y mantén un diálogo activo y humano.
 """
 }
 
@@ -176,6 +176,7 @@ def generate_summary(messages):
         return response.choices[0].message.content.strip()
     except:
         return "Nueva conversación"
+
 # -------------------
 # SIDEBAR
 # -------------------
@@ -325,11 +326,15 @@ if st.session_state.page == "chat":
 
 elif st.session_state.page == "about":
     st.title("📘 About CobraMind")
-    st.write("CobraMind is an advanced artificial intelligence assistant created by Lorenzo Mazzini.")
-    st.write("Developed by Lorenzo Mazzini, a Peruvian developer.")
-    st.markdown("---")
-    st.write("CobraMind is designed to assist you with various tasks, answer your questions, and engage in meaningful conversations using state-of-the-art language models.")
-    st.write("Inspired by a vision to create an efficient, continuous, and responsive AI companion that helps users unlock new levels of productivity and creativity.")
+    
+    st.markdown("### What it offers")
+    st.write("CobraMind is an advanced artificial intelligence assistant designed to seamlessly optimize your workflow. It features multi-modal capabilities allowing users to engage in context-aware conversations, generate custom visual assets from raw text descriptions, and stitch together seamless cinematic video compositions natively within a single user interface.")
+    
+    st.markdown("### Behind the Code")
+    st.write("This entire software ecosystem was architected and deployed by Lorenzo Mazzini, a passionate developer from Peru. By bridging complex backend integrations like open-source video renderers and OpenAI state-of-the-art language models, this platform transforms intricate API architectures into a fluid, user-friendly computational experience.")
+    
+    st.markdown("### The Inspiration")
+    st.write("The platform was inspired by a core vision to build a continuous, hyper-responsive digital companion that transcends the limits of standard text chatbots. It is driven by the ambition to build toolsets that empower individual builders, unlocking new horizons of scalable creative expression and professional productivity.")
 
 elif st.session_state.page == "credits":
     st.title("🏦 CobraCredits Bank")
@@ -367,6 +372,5 @@ elif st.session_state.page == "credits":
             save_current_user_state()
             st.success("¡Se han añadido 20,000 créditos a tu cuenta! 🐍")
             st.rerun()
-
 
 
