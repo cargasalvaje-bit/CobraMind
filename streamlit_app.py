@@ -313,10 +313,10 @@ if st.session_state.page == "chat":
                         stream=True
                     )
                     for chunk in stream:
-                        if chunk.choices.delta.content:
+                        if chunk.choices and chunk.choices.delta and chunk.choices.delta.content:
                             full_response += chunk.choices.delta.content
                             placeholder.markdown(full_response)
-                except:
+                except Exception as e:
                     full_response = "Error con la API."
                     placeholder.markdown(full_response)
 
@@ -329,8 +329,41 @@ elif st.session_state.page == "about":
     st.write("Desarrollado por Lorenzo Mazzini.")
 
 elif st.session_state.page == "credits":
-    st.title("🏦 CobraCredits")
+    st.title("🏦 CobraCredits Bank")
     st.write(f"Actualmente posees **{st.session_state.cobra_credits:,}** créditos CobraCredits.")
+    
+    st.markdown("---")
+    st.subheader("🛒 Recargar Créditos")
+    st.write("Selecciona un paquete para añadir más fondos a tu cuenta inmediatamente:")
+    
+    col_p1, col_p2, col_p3 = st.columns(3)
+    
+    with col_p1:
+        st.markdown("### 🥉 Paquete Básico")
+        st.write("➕ 1,000 CobraCredits")
+        if st.button("Comprar 1k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 1000
+            save_current_user_state()
+            st.success("¡Se han añadido 1,000 créditos a tu cuenta! 🎉")
+            st.rerun()
+            
+    with col_p2:
+        st.markdown("### 🥈 Paquete Avanzado")
+        st.write("➕ 5,000 CobraCredits")
+        if st.button("Comprar 5k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 5000
+            save_current_user_state()
+            st.success("¡Se han añadido 5,000 créditos a tu cuenta! 🚀")
+            st.rerun()
+            
+    with col_p3:
+        st.markdown("### 🥇 Paquete Cobra Master")
+        st.write("➕ 20,000 CobraCredits")
+        if st.button("Comprar 20k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 20000
+            save_current_user_state()
+            st.success("¡Se han añadido 20,000 créditos a tu cuenta! 🐍")
+            st.rerun()
 
 
 
