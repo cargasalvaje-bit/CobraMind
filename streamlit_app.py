@@ -348,27 +348,27 @@ elif st.session_state.page == "credits":
     
     with col_p1:
         st.markdown("### 🥉 Paquete Básico")
-        st.write("➕ 1,000 CobraCredits")
-        if st.button("Comprar 1k Créditos", use_container_width=True):
-            st.session_state.cobra_credits += 1000
+        st.write("➕ 5,000 CobraCredits")
+        if st.button("Comprar 5k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 5000
             save_current_user_state()
             st.success("¡Se han añadido 1,000 créditos a tu cuenta! 🎉")
             st.rerun()
             
     with col_p2:
         st.markdown("### 🥈 Paquete Avanzado")
-        st.write("➕ 5,000 CobraCredits")
-        if st.button("Comprar 5k Créditos", use_container_width=True):
-            st.session_state.cobra_credits += 5000
+        st.write("➕ 10,000 CobraCredits")
+        if st.button("Comprar 10k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 10000
             save_current_user_state()
             st.success("¡Se han añadido 5,000 créditos a tu cuenta! 🚀")
             st.rerun()
             
     with col_p3:
         st.markdown("### 🥇 Paquete Cobra Master")
-        st.write("➕ 20,000 CobraCredits")
-        if st.button("Comprar 20k Créditos", use_container_width=True):
-            st.session_state.cobra_credits += 20000
+        st.write("➕ 80,000 CobraCredits")
+        if st.button("Comprar 80k Créditos", use_container_width=True):
+            st.session_state.cobra_credits += 80000
             save_current_user_state()
             st.success("¡Se han añadido 20,000 créditos a tu cuenta! 🐍")
             st.rerun()
