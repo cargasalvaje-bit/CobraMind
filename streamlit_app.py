@@ -83,7 +83,8 @@ if "auth_mode" not in st.session_state:
 # PANTALLA DE AUTENTICACIÓN
 # -------------------
 if not st.session_state.logged_in:
-    col_main_1, col_main_2, col_main_3 = st.columns()
+    # CORREGIDO: Ahora pasamos [1, 2, 1] para indicar proporciones de columnas y evitar el TypeError
+    col_main_1, col_main_2, col_main_3 = st.columns([1, 2, 1])
     
     with col_main_2:
         st.write("") 
@@ -290,6 +291,7 @@ with st.sidebar:
                         save_current_user_state()
                 except Exception as e:
                     st.error(f"Error generando video: {e}")
+
 # -------------------
 # VISTAS DE PÁGINAS
 # -------------------
