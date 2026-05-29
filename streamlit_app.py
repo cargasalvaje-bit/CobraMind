@@ -167,7 +167,7 @@ def generate_summary(messages):
             [m["content"] for m in messages if m["role"] == "user"]
         )
         response = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4o-mini",
             messages=[
                 SYSTEM_PROMPT,
                 {"role": "user", "content": f"Resume en 5 palabras: {user_text}"}
@@ -308,13 +308,13 @@ if st.session_state.page == "chat":
                 full_response = ""
                 try:
                     stream = client.chat.completions.create(
-                        model="gpt-4.1-mini",
+                        model="gpt-4o-mini",
                         messages=[SYSTEM_PROMPT] + st.session_state.messages,
                         stream=True
                     )
                     for chunk in stream:
-                        if chunk.choices and chunk.choices.delta and chunk.choices.delta.content:
-                            full_response += chunk.choices.delta.content
+                        if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
+                            full_response += chunk.choices[0].delta.content
                             placeholder.markdown(full_response)
                 except Exception as e:
                     full_response = "Error con la API."
@@ -325,8 +325,11 @@ if st.session_state.page == "chat":
 
 elif st.session_state.page == "about":
     st.title("📘 About CobraMind")
-    st.write("CobraMind es un asistente avanzado potenciado por inteligencia artificial.")
-    st.write("Desarrollado por Lorenzo Mazzini.")
+    st.write("CobraMind is an advanced artificial intelligence assistant created by Lorenzo Mazzini.")
+    st.write("Developed by Lorenzo Mazzini, a Peruvian developer.")
+    st.markdown("---")
+    st.write("CobraMind is designed to assist you with various tasks, answer your questions, and engage in meaningful conversations using state-of-the-art language models.")
+    st.write("Inspired by a vision to create an efficient, continuous, and responsive AI companion that helps users unlock new levels of productivity and creativity.")
 
 elif st.session_state.page == "credits":
     st.title("🏦 CobraCredits Bank")
